@@ -84,6 +84,7 @@ int main()
     return 0;
 }
 
+
 struct point_mass {
     vec2 position;
     vec2 velocity;
@@ -102,31 +103,43 @@ struct engine {
     }
 };
 */
+
 struct Particle {
+    //Shape representing circle
     sf::CircleShape shape;
+    //2D vector includes both x and y coordinates
     vec2 velocity;
 
+    //position is the initial position of the particle
+    //: shape(radius), velocity(0.f, 0.f) this is the member initialiser list and this sets the radius and initial velocity
     Particle(float radius, const sf::Vector2f& position, const sf::Color& color)
         : shape(radius), velocity(0.f, 0.f) {
         shape.setPosition(position);
         shape.setFillColor(color);
     }
 
+    //Updates particle position every dt in time passed, this function shifts the particle by velocity * dt = change in position
     void update(float dt) {
-        shape.move(sf::Vector2f(velocity.x, velocity.y) * dt);
+        float gravity = 1000;
+        float dPositionx = velocity.x * dt;
+        //need to update velocity as it's changing with the acceleration of gravity with v = u + at
+        velocity.y += gravity * dt;
+        float dPositiony = (velocity.y * dt);
+        shape.move(sf::Vector2f(dPositionx, dPositiony));
     }
 
+    //reverses particles velocity when they hot the window boundary
     void checkBoundaryCollision(const sf::Vector2u& windowSize) {
         sf::Vector2f position = shape.getPosition();
         float radius = shape.getRadius();
 
         // Check collision with left and right edges
-        if (position.x - radius < 0 || position.x + radius > windowSize.x) {
+        if (position.x < 0 || position.x + (2*radius) > windowSize.x) {
             velocity.x = -velocity.x;  // Invert the x component of velocity
         }
 
         // Check collision with top and bottom edges
-        if (position.y - radius < 0 || position.y + radius > windowSize.y) {
+        if (position.y < 0 || position.y + (2*radius) > windowSize.y) {
             velocity.y = -velocity.y;  // Invert the y component of velocity
         }
     }
@@ -137,17 +150,19 @@ public:
     vector<Particle> particles;
 
     void addParticle(float radius, const sf::Vector2f& position, const sf::Color& color, const vec2& velocity) {
+        //inserts particle into particles vector
         particles.emplace_back(radius, position, color);
         particles.back().velocity = velocity;
     }
 
+    //Update all of the Particles in the system
     void update(float dt, const sf::Vector2u& windowSize) {
         for (auto& particle : particles) {
             particle.update(dt);
             particle.checkBoundaryCollision(windowSize);
         }
     }
-
+    //Renders the window and particles inside it
     void draw(sf::RenderWindow& window) {
         for (const auto& particle : particles) {
             window.draw(particle.shape);
@@ -160,12 +175,16 @@ int main() {
     sf::Clock clock;
 
     ParticleSystem particleSystem;
-    particleSystem.addParticle(50.f, sf::Vector2f(300.f, 300.f), sf::Color::Red, vec2(200.f, 50.f));
-    particleSystem.addParticle(50.f, sf::Vector2f(300.f, 300.f), sf::Color::Blue, vec2(-100.f, 200.f));
+    particleSystem.addParticle(50.f, sf::Vector2f(300.f, 100.f), sf::Color::Red, vec2(0.f, 0.f));
+    particleSystem.addParticle(50.f, sf::Vector2f(600.f, 100.f), sf::Color::Blue, vec2(0.f, 0.f));
+    //particleSystem.addParticle(50.f, sf::Vector2f(300.f, 300.f), sf::Color::Yellow, vec2(300.f, -100.f));
 
+    //run the program as long as the window is open
     while (window.isOpen()) {
+        //check all the window's events that were triggered since the last iteration of the loop
         sf::Event event;
         while (window.pollEvent(event)) {
+            //"close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window.close();
         }
