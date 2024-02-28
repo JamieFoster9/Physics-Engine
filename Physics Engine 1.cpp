@@ -2,133 +2,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 using namespace std;
 using namespace glm;
-
-/*
-int main()
-{
-    //Creates the window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
-    sf::CircleShape shape(10.f);
-    shape.setFillColor(sf::Color::Black);
-
-    sf::Font font;
-    font.loadFromFile("Fonts/Bodycount.otf");
-
-    sf::Text text;
-
-    // select the font
-    text.setFont(font); // font is a sf::Font
-
-    // set the string to display
-    text.setString("It'll be ogre soon!");
-
-    // set the character size
-    text.setCharacterSize(50); // in pixels, not points!
-
-    // set the color
-    text.setFillColor(sf::Color::Green);
-
-    // set the text style
-    //text.setStyle(sf::Text::Bold | sf::Text::Underlined);
-
-    text.move(sf::Vector2f(100.f, 0.f));
-
-    sf::Texture texture;
-    texture.loadFromFile("Images/Shrek.png");
-    texture.setSmooth(true);
-
-    sf::Sprite sprite;
-    sprite.setTexture(texture);
-
-    // position
-    sprite.setPosition(sf::Vector2f(10.f, 50.f)); // absolute position
-    sprite.move(sf::Vector2f(5.f, 10.f)); // offset relative to the current position
-
-    // rotation
-    //sprite.setRotation(90.f); // absolute angle
-    //sprite.rotate(15.f); // offset relative to the current angle
-
-    // scale
-    //sprite.setScale(sf::Vector2f(0.5f, 2.f)); // absolute scale factor
-    //sprite.scale(sf::Vector2f(1.5f, 3.f)); // factor relative to the current scale
-
-    //run the program as long as the window is open
-    while (window.isOpen())
-    {
-        //check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            //"close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        //clear the window with white colour
-        window.clear(sf::Color::White);
-
-        //draw everything here
-        window.draw(shape);
-
-        // inside the main loop, between window.clear() and window.display()
-        window.draw(text);
-
-        window.draw(sprite);
-
-        //end the current frame
-        window.display();
-    }
-
-    return 0;
-}
-
-
-struct point_mass {
-    vec2 position;
-    vec2 velocity;
-};
-
-struct engine {
-    vector<point_mass> points;
-    vec2 gravity;
-
-    void update(float dt) {
-        for (auto& p : points)
-            p.velocity += gravity * dt;
-
-        for (auto& p : points)
-            p.position += p.velocity * dt;
-    }
-};
-*/
-
-struct Spring {
-    //member variables
-    //Particle A
-    //Particle B
-    //Stiffness
-    //Default length
-
-    //Constructor to initialise properties of the spring
-    /*
-    Spring(Particle particleA, Particle particleB, float restLength, float stiffness)
-        : particleA(particleA), particleB(particleB), length(restLength), stiffness(stiffness) {
-    }
-    */
-
-    //need a method to update particles A position depending on particles B position
-    /*
-    void update(float dt) {
-        float dPositionx = particleA velocity.x * dt;
-        //need to update velocity as it's changing with the acceleration of gravity with v = u + at
-        velocity.y += gravity * dt;
-        float dPositiony = (velocity.y * dt);
-        shape.move(sf::Vector2f(dPositionx, dPositiony));
-    }
-    */
-};
 
 struct Particle {
     //Shape representing circle
@@ -136,23 +12,28 @@ struct Particle {
     //2D vector includes both x and y coordinates for position and velocity
     sf::Vector2f position;
     sf::Vector2f velocity;
-    float mass;
+    //float mass = 1;
 
     //position is the initial position of the particle
     //: shape(radius), velocity(0.f, 0.f) this is the member initialiser list and this sets the radius and initial velocity
     Particle(float radius, const sf::Vector2f& position, const sf::Color& color)
-        : shape(radius), velocity(0.f, 0.f), mass(mass) {
+        : shape(radius), velocity(0.f, 0.f) {
         shape.setPosition(position);
         shape.setFillColor(color);
     }
 
-    //force on particle from external forces
-    /*
-    void applyForce(sf::Vector2f force) {
+    sf::Vector2f getPosition() { return position; }
+
+    //force on particle from spring
+    void applyForce(sf::Vector2f force, float dt) {
+        float mass = 1000;
         sf::Vector2f acceleration = force / mass;
-        velocity += acceleration
+        sf::Vector2f velocityChange = acceleration * dt;
+        velocity += velocityChange;
+        sf::Vector2f positionChange = velocityChange * dt;
+        position += positionChange;
+        shape.move(sf::Vector2f(positionChange));
     }
-    */
 
     //Updates particle position every dt in time passed, this function shifts the particle by velocity * dt = change in position
     //we want to update the new position based on the previous 
@@ -163,9 +44,11 @@ struct Particle {
         //To do: should be 9.81 m/s2 but scale it for the frame scale
         float gravity = 1000;
         float dPositionx = velocity.x * dt;
+        position.x += dPositionx;
         //need to update velocity as it's changing with the acceleration of gravity with v2 = v1 + h(F1/m) or v2 = v1 + h*a1 as F/m = a which is constant for masses
         velocity.y += gravity * dt;
         float dPositiony = (velocity.y * dt);
+        position.y += dPositiony;
         shape.move(sf::Vector2f(dPositionx, dPositiony));
     }
 
@@ -174,19 +57,59 @@ struct Particle {
         sf::Vector2f position = shape.getPosition();
         float radius = shape.getRadius();
         // Check collision with left and right edges
-        if (position.x < 0 || position.x + (2*radius) > windowSize.x) {
+        if (position.x < 0 || position.x + (2 * radius) > windowSize.x) {
             velocity.x = -velocity.x;  // Invert the x component of velocity
         }
         // Check collision with top and bottom edges
-        if (position.y < 0 || position.y + (2*radius) > windowSize.y) {
+        if (position.y < 0 || position.y + (2 * radius) > windowSize.y) {
             velocity.y = -velocity.y;  // Invert the y component of velocity
         }
+    }
+};
+
+struct Spring {
+    //member variables
+    Particle& particle1;
+    Particle& particle2;
+    float stiffness; //k = F/x
+    float damping = 0; //F = c * v; damping force equals the coefficient * change in velocithy
+    float length; //default length between particles
+
+    //Constructor to initialise properties of the spring
+    //spring has to be connected to 2 particles
+    Spring(Particle& particle1, Particle& particle2, float stiffness, float damping, float length)
+        : particle1(particle1), particle2(particle2), stiffness(stiffness), damping(damping), length(length) {}
+
+    float calculateMagnitude(sf::Vector2f& vector) {
+        return sqrt((vector.x * vector.x) + (vector.y * vector.y));
+    }
+
+    sf::Vector2f normalise(const sf::Vector2f& vector) {
+        float magnitude = sqrt(vector.x * vector.x + vector.y * vector.y);
+        if (magnitude != 0) {
+            return sf::Vector2f(vector.x / magnitude, vector.y / magnitude);
+        }
+        else {
+            // Handle division by zero or zero-length vectors
+            return sf::Vector2f(0, 0);
+        }
+    }
+
+    //Applies force from spring to particles
+    void applyForce(float dt) {
+        sf::Vector2f displacement = particle2.getPosition() - particle1.getPosition(); //difference in distance between the x and y coordinates of each particle
+        float distance = calculateMagnitude(displacement); //gets the magnitude
+        float force = stiffness * (distance - length); //Force exerted by spring in direction of spring F = kx
+        sf::Vector2f normalisedDisplacement = normalise(displacement);
+        particle1.applyForce(normalisedDisplacement * force, dt);
+        particle2.applyForce(normalisedDisplacement * (-force), dt);
     }
 };
 
 class ParticleSystem {
 public:
     vector<Particle> particles;
+    vector<Spring> springs;
 
     void addParticle(float radius, const sf::Vector2f& position, const sf::Color& color, const sf::Vector2f& velocity) {
         //inserts particle into particles vector
@@ -194,11 +117,27 @@ public:
         particles.back().velocity = velocity;
     }
 
+
+    void addSpring(Particle& particle1, Particle& particle2, double stiffness, double damping, double length) {
+        //inserts particle into particles vector
+        Spring spring = Spring(particle1, particle2, stiffness, damping, length);
+        springs.emplace_back(spring);
+    }
+
     //Update all of the Particles in the system
+
+    //for each particle
+    //update particle based on current speed and gravity
+    //check if there's a boundary
+
+
     void update(float dt, const sf::Vector2u& windowSize) {
         for (auto& particle : particles) {
             particle.update(dt);
             particle.checkBoundaryCollision(windowSize);
+        }
+        for (auto& spring : springs) {
+            spring.applyForce(dt);
         }
     }
     //Renders the window and particles inside it
@@ -212,6 +151,12 @@ public:
 int main() {
     sf::RenderWindow window(sf::VideoMode(1400, 800), "SFML Particle System");
     sf::Clock clock; //starts clock
+    sf::Time micro = sf::microseconds(10000);
+    sf::Time milli = sf::milliseconds(10);
+    sf::Time second = sf::seconds(0.01f);
+    const float Speed = 50.f;
+    float Left = 0.f;
+    float Top = 0.f;
     sf::Text text;
     sf::Font font;
     font.loadFromFile("Fonts/Montserrat.otf");
@@ -222,9 +167,9 @@ int main() {
     text.setFillColor(sf::Color::Black);
 
     ParticleSystem particleSystem;
-    particleSystem.addParticle(10.f, sf::Vector2f(300.f, 100.f), sf::Color::Red, sf::Vector2f(300.f, -100.f));
+    particleSystem.addParticle(10.f, sf::Vector2f(300.f, 100.f), sf::Color::Red, sf::Vector2f(0.f, 0.f));
     particleSystem.addParticle(10.f, sf::Vector2f(600.f, 100.f), sf::Color::Blue, sf::Vector2f(-500.f, 0.f));
-    particleSystem.addParticle(10.f, sf::Vector2f(20.f, 100.f), sf::Color::Yellow, sf::Vector2f(-500.f, 0.f));
+    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 10000, 0, 5); //created a spring between particle 1 and 2
 
     //run the program as long as the window is open
     while (window.isOpen()) {
@@ -236,10 +181,18 @@ int main() {
                 window.close();
         }
 
-        float dt = clock.restart().asSeconds(); //restarts clock and returns time elapsed in seconds
+        float dt = clock.getElapsedTime().asSeconds();
+
+        clock.restart();
+
+        //if (window.GetInput().IsKeyDown(sf::Key::Left))  Left -= Speed * dt;
+        //if (window.GetInput().IsKeyDown(sf::Key::Right)) Left += Speed * dt;
+        //if (window.GetInput().IsKeyDown(sf::Key::Up))    Top -= Speed * dt;
+        //if (window.GetInput().IsKeyDown(sf::Key::Down))  Top += Speed * dt;
+
         float framerate = 1 / dt; //Framerate in Hz
         string framesText = to_string(framerate);
-        text.setString(framesText + " Hz");
+        text.setString(framesText + " fps");
         window.draw(text);
         particleSystem.update(dt, window.getSize());
         window.clear(sf::Color::White);
