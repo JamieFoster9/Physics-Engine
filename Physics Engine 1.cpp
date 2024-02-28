@@ -46,7 +46,7 @@ struct Particle {
         float dPositionx = velocity.x * dt;
         position.x += dPositionx;
         //need to update velocity as it's changing with the acceleration of gravity with v2 = v1 + h(F1/m) or v2 = v1 + h*a1 as F/m = a which is constant for masses
-        velocity.y += gravity * dt;
+        //velocity.y += gravity * dt;
         float dPositiony = (velocity.y * dt);
         position.y += dPositiony;
         shape.move(sf::Vector2f(dPositionx, dPositiony));
@@ -118,7 +118,7 @@ public:
     }
 
 
-    void addSpring(Particle& particle1, Particle& particle2, double stiffness, double damping, double length) {
+    void addSpring(Particle& particle1, Particle& particle2, float stiffness, float damping, float length) {
         //inserts particle into particles vector
         Spring spring = Spring(particle1, particle2, stiffness, damping, length);
         springs.emplace_back(spring);
@@ -145,6 +145,15 @@ public:
         for (const auto& particle : particles) {
             window.draw(particle.shape);
         }
+        for (const auto& spring : springs) {
+            sf::VertexArray line(sf::Lines, 2);
+            // Set the positions of the line vertices to the positions of the connected particles
+            line[0].position = spring.particle1.shape.getPosition() + sf::Vector2f(spring.particle1.shape.getRadius(), spring.particle1.shape.getRadius());
+            line[1].position = spring.particle2.shape.getPosition() + sf::Vector2f(spring.particle2.shape.getRadius(), spring.particle2.shape.getRadius());
+            line[0].color = sf::Color::Black; // Example color (change as needed)
+            line[1].color = sf::Color::Black; // Example color (change as needed)
+            window.draw(line);
+        }
     }
 };
 
@@ -167,9 +176,26 @@ int main() {
     text.setFillColor(sf::Color::Black);
 
     ParticleSystem particleSystem;
-    particleSystem.addParticle(10.f, sf::Vector2f(300.f, 100.f), sf::Color::Red, sf::Vector2f(0.f, 0.f));
-    particleSystem.addParticle(10.f, sf::Vector2f(600.f, 100.f), sf::Color::Blue, sf::Vector2f(-500.f, 0.f));
-    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 10000, 0, 5); //created a spring between particle 1 and 2
+    particleSystem.addParticle(10.f, sf::Vector2f(100.f, 400.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //1
+    particleSystem.addParticle(10.f, sf::Vector2f(150.f, 400.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //2
+    particleSystem.addParticle(10.f, sf::Vector2f(200.f, 400.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //3
+    particleSystem.addParticle(10.f, sf::Vector2f(250.f, 400.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //4
+    particleSystem.addParticle(10.f, sf::Vector2f(300.f, 400.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //5
+    particleSystem.addParticle(10.f, sf::Vector2f(300.f, 350.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //6
+    particleSystem.addParticle(10.f, sf::Vector2f(250.f, 350.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //7
+    particleSystem.addParticle(10.f, sf::Vector2f(200.f, 350.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //8
+    particleSystem.addParticle(10.f, sf::Vector2f(150.f, 350.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //9
+    particleSystem.addParticle(10.f, sf::Vector2f(100.f, 350.f), sf::Color::Blue, sf::Vector2f(0.f, 0.f)); //10
+    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 10000, 0, 10); //created a spring between particle 1 and 2
+    particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[2], 10000, 0, 10); //created a spring between particle 2 and 3
+    particleSystem.addSpring(particleSystem.particles[2], particleSystem.particles[3], 10000, 0, 10); //created a spring between particle 3 and 1
+    particleSystem.addSpring(particleSystem.particles[3], particleSystem.particles[4], 10000, 0, 10); //created a spring between particle 1 and 2
+    particleSystem.addSpring(particleSystem.particles[4], particleSystem.particles[5], 10000, 0, 10); //created a spring between particle 2 and 3
+    particleSystem.addSpring(particleSystem.particles[5], particleSystem.particles[6], 10000, 0, 10); //created a spring between particle 3 and 1
+    particleSystem.addSpring(particleSystem.particles[6], particleSystem.particles[7], 10000, 0, 10); //created a spring between particle 1 and 2
+    particleSystem.addSpring(particleSystem.particles[7], particleSystem.particles[8], 10000, 0, 10); //created a spring between particle 2 and 3
+    particleSystem.addSpring(particleSystem.particles[8], particleSystem.particles[9], 10000, 0, 10); //created a spring between particle 3 and 1
+    particleSystem.addSpring(particleSystem.particles[9], particleSystem.particles[0], 10000, 0, 10); //created a spring between particle 3 and 1
 
     //run the program as long as the window is open
     while (window.isOpen()) {
