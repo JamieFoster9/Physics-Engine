@@ -5,10 +5,9 @@ public:
     vector<Particle> particles;
     vector<Spring> springs;
 
-    void addParticle(float radius, const sf::Vector2f& position, const sf::Color& color, const sf::Vector2f& velocity) {
+    void addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color) {
         //inserts particle into particles vector
-        particles.emplace_back(radius, position, color);
-        particles.back().velocity = velocity;
+        particles.emplace_back(radius, position, velocity , color);
     }
 
 
@@ -26,12 +25,12 @@ public:
 
 
     void update(float dt, const sf::Vector2u& windowSize) {
+        for (auto& spring : springs) {
+            spring.applyForce(dt);
+        }
         for (auto& particle : particles) {
             particle.update(dt);
             particle.checkBoundaryCollision(windowSize);
-        }
-        for (auto& spring : springs) {
-            spring.applyForce(dt);
         }
     }
     //Renders the window and particles inside it
