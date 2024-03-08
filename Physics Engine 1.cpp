@@ -30,18 +30,25 @@ int main() {
     text.setFillColor(sf::Color::Black);
 
     ParticleSystem particleSystem;
-    particleSystem.addParticle(10.f, sf::Vector2f(500.f, 350.f), sf::Vector2f(300.f, 300.f), sf::Color::Blue);
-    particleSystem.addParticle(10.f, sf::Vector2f(600.f, 350.f), sf::Vector2f(400.f, 100.f), sf::Color::Blue);
-    particleSystem.addParticle(10.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(500.f, 600.f), sf::Color::Blue);
-    particleSystem.addParticle(10.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(0.f, 0.f), sf::Color::Blue);
 
+    particleSystem.addRectangle(sf::Vector2f(700.f, 400.f), 10, 10);
+
+    /*
+    particleSystem.addParticle(10.f, sf::Vector2f(500.f, 350.f), sf::Vector2f(300.f, 200.f), sf::Color::Blue);
+    particleSystem.addParticle(10.f, sf::Vector2f(600.f, 350.f), sf::Vector2f(400.f, 100.f), sf::Color::Blue);
+    particleSystem.addParticle(10.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(500.f, 100.f), sf::Color::Blue);
+    particleSystem.addParticle(10.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(0.f, 0.f), sf::Color::Blue);
+    */
   
-    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 100, 0, 200);
-    particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[2], 100, 0, 200);
-    particleSystem.addSpring(particleSystem.particles[2], particleSystem.particles[3], 100, 0, 200);
-    particleSystem.addSpring(particleSystem.particles[3], particleSystem.particles[0], 100, 0, 200);
-    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[2], 100, 0, 200);
-    particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[3], 100, 0, 200);
+    /*
+    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 1000, 0, 200);
+    particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[2], 1000, 0, 200);
+    particleSystem.addSpring(particleSystem.particles[2], particleSystem.particles[3], 1000, 0, 200);
+    particleSystem.addSpring(particleSystem.particles[3], particleSystem.particles[0], 1000, 0, 200);
+    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[2], 1000, 0, 200);
+    particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[3], 1000, 0, 200);
+    */
+
     /*
     particleSystem.addSpring(particleSystem.particles[4], particleSystem.particles[5], 10000, 0, 10); //created a spring between particle 2 and 3
     particleSystem.addSpring(particleSystem.particles[5], particleSystem.particles[6], 10000, 0, 10); //created a spring between particle 3 and 1

@@ -34,7 +34,7 @@ struct Particle {
         float gravity = 1000;
         float dPositionx = velocity.x * dt;
         float dPositiony = velocity.y * dt;
-        //velocity.y += gravity * dt; //need to update velocity as it's changing with the acceleration of gravity with v2 = v1 + h(F1/m) or v2 = v1 + h*a1 as F/m = a which is constant for masses
+        velocity.y += gravity * dt; //need to update velocity as it's changing with the acceleration of gravity with v2 = v1 + h(F1/m) or v2 = v1 + h*a1 as F/m = a which is constant for masses
         position.x += dPositionx;
         position.y += dPositiony;
         shape.move(sf::Vector2f(dPositionx, dPositiony));
