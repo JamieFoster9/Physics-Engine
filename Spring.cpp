@@ -19,7 +19,10 @@ void Spring::applyForce(float dt) {
     sf::Vector2f displacement = particle2.getPosition() - particle1.getPosition(); //difference in distance between the x and y coordinates of each particle //400
     float distance = calculateMagnitude(displacement); //gets the magnitude //400
     float force = stiffness * (distance - length); //Force exerted by spring in direction of spring F = kx //100 * (400 - 100) = 300000
-    sf::Vector2f direction = normalise(displacement); //(1,0)
-    particle1.applyForce(direction * force, dt); //(30000, 0)
-    particle2.applyForce(direction * (-force), dt);//(-30000, 0)
+    sf::Vector2f direction = normalise(displacement); //(1,0) unit vector
+    sf::Vector2f relativeVelocity = particle2.velocity - particle1.velocity;
+    float dampingForceMagnitude = damping * dotProduct(relativeVelocity, direction);
+    sf::Vector2f dampingForce = dampingForceMagnitude * direction;
+    particle1.applyForce((direction * force) + dampingForce, dt); //(30000, 0)
+    particle2.applyForce((direction * (-force)) - dampingForce, dt);//(-30000, 0)
 }

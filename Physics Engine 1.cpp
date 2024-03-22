@@ -10,11 +10,11 @@ using namespace glm;
 int main() {
     sf::RenderWindow window(sf::VideoMode(1400, 800), "SFML Particle System");
     sf::Clock clock; //starts clock
-    float timePerFrame = 1/300; //time value of 60 fps
+    float timePerFrame = 1/120; //time value of 60 fps
     //sf::Time micro = sf::microseconds(10000);
     //sf::Time milli = sf::milliseconds(10);
     //sf::Time second = sf::seconds(0.01f);
-    window.setFramerateLimit(300);
+    window.setFramerateLimit(120);
     const float Speed = 50.f;
     float Left = 0.f;
     float Top = 0.f;
@@ -29,22 +29,18 @@ int main() {
 
     ParticleSystem particleSystem;
 
-    //particleSystem.addRectangle(sf::Vector2f(700.f, 400.f), 10, 10);
+    particleSystem.addRectangle(sf::Vector2f(400.f, 300.f), 30, 10);
 
-    
-    particleSystem.addParticle(50.f, sf::Vector2f(500.f, 350.f), sf::Vector2f(300.f, 200.f), sf::Color::Blue);
-    particleSystem.addParticle(50.f, sf::Vector2f(600.f, 350.f), sf::Vector2f(400.f, 100.f), sf::Color::Blue);
-    particleSystem.addParticle(50.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(500.f, 100.f), sf::Color::Blue);
-    particleSystem.addParticle(50.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(0.f, 0.f), sf::Color::Blue);
-    particleSystem.addParticle(50.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(100.f, 150.f), sf::Color::Blue);
-    //particleSystem.addParticle(10.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(450.f, 50.f), sf::Color::Blue);
-    //particleSystem.addParticle(10.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(150.f, 500.f), sf::Color::Blue);
+    //particleSystem.addParticle(20.f, sf::Vector2f(500.f, 350.f), sf::Vector2f(10.f, 50.f), sf::Color::Blue, false);
+    //particleSystem.addParticle(20.f, sf::Vector2f(600.f, 350.f), sf::Vector2f(0.f, 0.f), sf::Color::Blue, true);
+    //particleSystem.addParticle(50.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(500.f, 100.f), sf::Color::Blue);
+    //particleSystem.addParticle(50.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(0.f, 0.f), sf::Color::Blue);
+    //particleSystem.addParticle(50.f, sf::Vector2f(100.f, 200.f), sf::Vector2f(450.f, 50.f), sf::Color::Blue);
+    //particleSystem.addParticle(20.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(150.f, 500.f), sf::Color::Blue);
     //particleSystem.addParticle(10.f, sf::Vector2f(500.f, 450.f), sf::Vector2f(100.f, 600.f), sf::Color::Blue);
     //particleSystem.addParticle(10.f, sf::Vector2f(600.f, 450.f), sf::Vector2f(50.f, 450.f), sf::Color::Blue);
-    
-
+   
     /*
-    particleSystem.addSpring(particleSystem.particles[0], particleSystem.particles[1], 1000, 0, 200);
     particleSystem.addSpring(particleSystem.particles[1], particleSystem.particles[2], 1000, 0, 200);
     particleSystem.addSpring(particleSystem.particles[2], particleSystem.particles[3], 1000, 0, 200);
     particleSystem.addSpring(particleSystem.particles[3], particleSystem.particles[0], 1000, 0, 200);
@@ -72,12 +68,10 @@ int main() {
         }
 
         float dt = clock.getElapsedTime().asSeconds();
-        /*
         if (dt < timePerFrame) {
             sf::sleep(sf::seconds(timePerFrame - dt));
             dt += timePerFrame - dt;
         }
-        */
         clock.restart();
 
         //if (window.GetInput().IsKeyDown(sf::Key::Left))  Left -= Speed * dt;
@@ -93,7 +87,7 @@ int main() {
         window.clear(sf::Color::White);
         particleSystem.draw(window);
         window.draw(text);
-        window.display();;
+        window.display();
     }
 
     return 0;

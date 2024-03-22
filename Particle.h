@@ -5,11 +5,12 @@ struct Particle {
     sf::CircleShape shape; //Shape representing circle
     sf::Vector2f position; //2D vector of type float includes both x and y coordinates for position and velocity
     sf::Vector2f velocity;
+    bool fixedParticle = false;
 
     //position is the initial position of the particle but will update if the particle moves so we need a reference to it
     //: shape(radius), velocity(0.f, 0.f) this is the member initialiser list and this sets the radius and initial velocity
-    Particle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity,const sf::Color& color)
-        : shape(radius), position(position), velocity(velocity) {
+    Particle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity,const sf::Color& color, bool fixedParticle)
+        : shape(radius), position(position), velocity(velocity), fixedParticle(fixedParticle) {
         shape.setPosition(position);
         shape.setFillColor(color);
     }

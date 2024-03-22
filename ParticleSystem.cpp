@@ -2,17 +2,17 @@
 #include "ParticleSystem.h"
 using namespace std;
 
-void ParticleSystem::addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color) {
-    particles.emplace_back(radius, position, velocity, color);
+void ParticleSystem::addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color, bool fixedParticle) {
+    particles.emplace_back(radius, position, velocity, color, fixedParticle);
 }
 
-void ParticleSystem::addSpring(Particle& particle1, Particle& particle2, float stiffness, float damping, float length) {
-    Spring spring = Spring(particle1, particle2, stiffness, damping, length);
+void ParticleSystem::addSpring(Particle& particle1, Particle& particle2, float length) {
+    Spring spring = Spring(particle1, particle2, length);
     springs.emplace_back(spring);
 }
 
 void ParticleSystem::update(float dt, const sf::Vector2u& windowSize) {
-    checkParticleCollision(windowSize);
+    checkParticleCollision(windowSize, dt);
     for (auto& spring : springs) {
         spring.applyForce(dt);
     }
@@ -53,40 +53,56 @@ void ParticleSystem::addRectangle(sf::Vector2f startPosition, int width, int hei
 
     for (int i = 0; i < height; i++) { //for each row in the height
         for (int j = 0; j < width; j++) { //this creates rows of particles
-            addParticle(5.f, particlePosition, velocity, sf::Color::Blue); //next particle in width
+            addParticle(5.f, particlePosition, velocity, sf::Color::Blue, false); //next particle in width
             particlePosition += sf::Vector2f(20.f, 0.f); //adds 20 to x position
         }
         rowPosition += sf::Vector2f(0.f, 20.f); //resets position and adds 20 to y position
         particlePosition = rowPosition; //Set first particle to new row position
     }
     for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width - 1; j++) { //this adds springs between particles
-            addSpring(particles[particleNumber], particles[particleNumber + 1], 100000, 0, 20); //join particle to previous particle
+        for (int j = 0; j < width - 1; j++) { //this adds springs between particles in each row
+            addSpring(particles[particleNumber], particles[particleNumber + 1], 20); //join particle to previous particle
             particleNumber += 1;
         }
         particleNumber += 1;
     }
     particleNumber = 0;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width - 1; j++) { //this adds springs between particles
-            addSpring(particles[particleNumber], particles[particleNumber + width], 100000, 0, 20); //join particle to previous particle
+    for (int i = 0; i < height-1; i++) {
+        for (int j = 0; j < width; j++) { //this adds springs between particles in each column
+            addSpring(particles[particleNumber], particles[particleNumber + width], 20); //join particle to previous particle
             particleNumber += 1;
         }
     }
 }
 
-void ParticleSystem::checkParticleCollision(const sf::Vector2u& windowSize) {
+void ParticleSystem::checkParticleCollision(const sf::Vector2u& windowSize, float dt) {
+    
+    int repulsionFactor = 10;
+
+    for (auto iterator1 = particles.begin(); iterator1 != particles.end(); ++iterator1) { //for a particle
+        for (auto iterator2 = next(iterator1); iterator2 != particles.end(); ++iterator2) { //compare particle to every other particle
+            Particle& p1 = *iterator1;
+            Particle& p2 = *iterator2;
+    /*
     for (Particle& p1 : particles) { //for a particle
-        for (Particle p2 : particles) { //compare particle to every other particle
+        for (Particle& p2 : particles) { //compare particle to every other particle
             if (p1.getPosition() == p2.getPosition()) {
                 continue;
             }
+            */
+
             sf::Vector2f displacement = p2.getPosition() - p1.getPosition(); //difference in distance between the x and y coordinates of each particle
             float distance = calculateMagnitude(displacement); //gets the magnitude
             if (round(distance) < p1.shape.getRadius() * 2) { //if the distnce between to cicircle is less than their combined radius then it is colliding
                 //Project velocities into components along normal
                 //normalVelcoities is the particles velocity in direction of the normal vector
-                sf::Vector2f normal = displacement / distance; //unti normal vector
+
+                sf::Vector2f repulsionForce = (p1.shape.getRadius() * 2 - distance) * repulsionFactor * (displacement / distance);
+                // Apply repulsion force to both particles
+                p1.applyForce(repulsionForce,dt);
+                p2.applyForce(-repulsionForce,dt);
+                
+                sf::Vector2f normal = displacement / distance; //unit normal vector
                 sf::Vector2f tangent(-displacement.y / distance, displacement.x / distance); // Unit tangent vector
                 float normalVelocityP1 = dotProduct(p1.velocity, normal);
                 float tangentVelocityP1 = dotProduct(p1.velocity, tangent);

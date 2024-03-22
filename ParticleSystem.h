@@ -8,10 +8,10 @@ public:
     vector<Spring> springs;
 
     //Creates particle and inserts it into particles vector
-    void addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color);
+    void addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color, bool fixedParticle);
 
     //inserts particle into particles vector
-    void addSpring(Particle& particle1, Particle& particle2, float stiffness, float damping, float length);
+    void addSpring(Particle& particle1, Particle& particle2, float length);
 
     //Updates all of the Particles and springs in the system
     void update(float dt, const sf::Vector2u& windowSize);
@@ -29,5 +29,5 @@ public:
     float dotProduct(const sf::Vector2f& velocity, const sf::Vector2f& normal);
 
     //for every particle we want to compare it to every other particle to check if it is in its boundary
-    void checkParticleCollision(const sf::Vector2u& windowSize);
+    void checkParticleCollision(const sf::Vector2u& windowSize, float dt);
 };
