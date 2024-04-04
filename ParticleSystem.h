@@ -1,14 +1,17 @@
-//#include "Particle.h"
+#include <vector>
+#include <list>
 #include "Spring.h"
 using namespace std;
 
 class ParticleSystem {
 public:
     vector<Particle> particles;
-    vector<Spring> springs;
+    list<Spring> springs;
+    vector<Particle> newParticles;
+    list<Spring> newSprings;
 
     //Creates particle and inserts it into particles vector
-    void addParticle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity, const sf::Color& color, bool fixedParticle);
+    void addParticle(float radius, sf::Vector2f position, sf::Vector2f velocity, const sf::Color& color, bool fixedParticle, float mass);
 
     //inserts particle into particles vector
     void addSpring(Particle& particle1, Particle& particle2, float length);
@@ -20,7 +23,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     //Creates a grid of particles and springs
-    void addRectangle(sf::Vector2f startPosition, int width, int height);
+    void addRectangle(sf::Vector2f startPosition, int width, int height, float spacing, float radius);
 
     //Calculates the magnitude
     float calculateMagnitude(sf::Vector2f& vector);

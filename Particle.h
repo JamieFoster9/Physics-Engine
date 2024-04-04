@@ -2,21 +2,33 @@
 #include <SFML/System.hpp>
 
 struct Particle {
+
+    static float commonMass; //mass for all particle
+    static float commonGravity; //gravity for all particles
+    float mass;
+    float gravity = 500;
     sf::CircleShape shape; //Shape representing circle
     sf::Vector2f position; //2D vector of type float includes both x and y coordinates for position and velocity
     sf::Vector2f velocity;
     bool fixedParticle = false;
-
     //position is the initial position of the particle but will update if the particle moves so we need a reference to it
     //: shape(radius), velocity(0.f, 0.f) this is the member initialiser list and this sets the radius and initial velocity
-    Particle(float radius, const sf::Vector2f& position, const sf::Vector2f& velocity,const sf::Color& color, bool fixedParticle)
-        : shape(radius), position(position), velocity(velocity), fixedParticle(fixedParticle) {
+    Particle(float radius, sf::Vector2f position, sf::Vector2f velocity, sf::Color color, bool fixedParticle, float mass)
+        : shape(radius), position(position), velocity(velocity), fixedParticle(fixedParticle), mass(mass) {
         shape.setPosition(position);
         shape.setFillColor(color);
+        shape.setOrigin(shape.getRadius(), shape.getRadius()); // set the circles position to the centre
     }
 
-    //Gets position of the particle
     sf::Vector2f getPosition();
+
+    float getMass();
+
+    float getGravity();
+
+    void setMass(float massValue);
+
+    void setGravity(float gravityValue);
 
     //Force on particle from spring
     void applyForce(sf::Vector2f force, float dt);
@@ -32,33 +44,5 @@ struct Particle {
 
     //BUG:: particle keeps reversing velocity while it's in the boundary
     //reverses particles velocity when they are within the window boundary
-    void checkBoundaryCollision(const sf::Vector2u& windowSize);
-
-    /*
-    void checkBoundaryCollision(const sf::Vector2u& windowSize, Particle& particle) {
-        sf::Vector2f position = shape.getPosition();
-        float radius = shape.getRadius();
-
-        // Check collision with left and right edges
-        if (!particle.colliding) {
-            if (position.x <= 0 || position.x + (2 * radius) >= windowSize.x) { //Check collision with left and right edges
-                velocity.x = -velocity.x;  // Invert the x component of velocity
-                particle.colliding = true;
-            }
-
-            if (position.y <= 0 || position.y + (2 * radius) >= windowSize.y) { // Check collision with top and bottom edges
-                velocity.y = -velocity.y;  // Invert the y component of velocity
-                particle.colliding = true;
-            }
-        }
-        else {
-            if (position.x > 0 && position.x + (2 * radius) > windowSize.x) { //Check collision with left and right edges
-                particle.colliding = false;
-            }
-            if (position.y > 0 && position.y + (2 * radius) > windowSize.y) { // Check collision with top and bottom edges
-                particle.colliding = false;
-            }
-        }
-    }
-    */
+    void checkBoundaryCollision(const sf::Vector2u& windowSize, float dt);
 };

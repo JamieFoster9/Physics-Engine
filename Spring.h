@@ -5,14 +5,33 @@
 struct Spring {
     Particle& particle1;
     Particle& particle2;
-    float stiffness = 10000; //k = F/x
-    float damping = 20; //F = c * v; damping force equals the coefficient * change in velocithy
-    float length; //default length between particles
+    float stiffness = 4000; //k = F/x
+    float damping = 30; //F = c * v; damping force equals the coefficient * change in velocity
+    float defaultLength; //default length between particles
+    float breakLength = 15;
+    Spring& operator=(const Spring& other);
 
     //Constructor to initialise properties of the spring
     //spring has to be connected to 2 particles
     Spring(Particle& particle1, Particle& particle2, float length)
-        : particle1(particle1), particle2(particle2), length(length) {}
+        : particle1(particle1), particle2(particle2), defaultLength(length) {}
+
+    float getStiffness();
+
+    float getDamping();
+
+    //Gets the distance that the spring is compressed or extended from it default length
+    float getDistance();
+
+    Particle getParticle1();
+
+    Particle getParticle2();
+
+    void setStiffness(float stiffnessValue);
+
+    void setDamping(float dampingValue);
+
+    bool shouldRemoveSpring();
 
     float calculateMagnitude(sf::Vector2f& vector);
 
@@ -23,6 +42,8 @@ struct Spring {
         return velocity.x * normal.x + velocity.y * normal.y;
     }
 
+    bool exceededLength();
+
     //Applies force from spring to particles
-    void applyForce(float dt);
+    sf::Vector2f calculateForce();
 };
