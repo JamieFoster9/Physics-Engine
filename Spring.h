@@ -5,14 +5,12 @@
 struct Spring {
     Particle& particle1;
     Particle& particle2;
-    float stiffness = 4000; //k = F/x
-    float damping = 30; //F = c * v; damping force equals the coefficient * change in velocity
-    float defaultLength; //default length between particles
-    float breakLength = 15;
-    Spring& operator=(const Spring& other);
+    float stiffness = 3000; //3000
+    float damping = 20; //20
+    float defaultLength;
+    float breakLength = 15; //15
 
-    //Constructor to initialise properties of the spring
-    //spring has to be connected to 2 particles
+    //Spring is initialised with a reference to two particles
     Spring(Particle& particle1, Particle& particle2, float length)
         : particle1(particle1), particle2(particle2), defaultLength(length) {}
 
@@ -20,30 +18,33 @@ struct Spring {
 
     float getDamping();
 
-    //Gets the distance that the spring is compressed or extended from it default length
-    float getDistance();
-
+    //Returns a reference to particle 1 in the spring
     Particle getParticle1();
 
+    //Returns a reference to particle 2 in the spring
     Particle getParticle2();
 
-    void setStiffness(float stiffnessValue);
+    //Gets the displacement vector between two particles
+    sf::Vector2f getDisplacement();
 
-    void setDamping(float dampingValue);
+    //Gets the distance magnitude between two particles
+    float getDistance();
 
+    //Returns the change in length of the spring from the default length
+    float getChangeInLength();
+
+    //Returns true if a spring exceeds the break length
     bool shouldRemoveSpring();
 
-    float calculateMagnitude(sf::Vector2f& vector);
+    //Returns the magnitude of a vector
+    float calculateMagnitude(sf::Vector2f vector);
 
-    //Normalise vectors
-    sf::Vector2f normalise(const sf::Vector2f& vector);
+    //Returns the unit normal vector of a vector
+    sf::Vector2f normalise(sf::Vector2f vector);
 
-    float dotProduct(const sf::Vector2f& velocity, const sf::Vector2f& normal) {
-        return velocity.x * normal.x + velocity.y * normal.y;
-    }
+    //Return the magnitude of the velocity along the normal
+    float dotProduct(sf::Vector2f velocity, sf::Vector2f normal);
 
-    bool exceededLength();
-
-    //Applies force from spring to particles
+    //Calculates the force that a spring exerts on a particle
     sf::Vector2f calculateForce();
 };
